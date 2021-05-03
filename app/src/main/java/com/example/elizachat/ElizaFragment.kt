@@ -21,7 +21,9 @@ class ElizaFragment : Fragment() {
         ViewModelProvider(this).get(ChatViewModel::class.java)
     }
     private lateinit var chatRecyclerView: RecyclerView
-    private var adapter: MessageAdapter? = null
+    private var adapter: MessageAdapter? = MessageAdapter().apply { setMessageList(emptyList()) }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //Log.d(TAG, "Total Messages: ${chatViewModel.messages.size}")
@@ -33,57 +35,92 @@ class ElizaFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_eliza, container, false)
+
+        //RECYCLER VIEW SETUP
         chatRecyclerView = view.findViewById(R.id.chatRecyclerView) as RecyclerView
-        val lm = LinearLayoutManager(context)
-        lm.stackFromEnd = true
-        chatRecyclerView.layoutManager = lm
-        updateUI()
-        chatViewModel.messagesLiveData.observe(this, messageObserver)
+        chatRecyclerView.layoutManager = LinearLayoutManager(context).apply {
+            stackFromEnd = true
+        }
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        chatViewModel.messagesLiveData.observe(viewLifecycleOwner, messageObserver)
+        if (chatViewModel.elizaHasMemory()){
+            val elizaPrompt = Message(
+                    user="Eliza",
+                    message ="What's on your mind",
+                    sent=false,
+                    time=Calendar.getInstance().timeInMillis
+            )
+            onMessageSend(elizaPrompt)
+        }
+
     }
 
     override fun onStart() {
         super.onStart()
+
+
+
+        //SEND BUTTON LISTENER
         sendButton.setOnClickListener {
+
+
             if (messageText.text.isNotEmpty()){
                 val message = Message(
-                        "user",
-                        messageText.text.toString(),
-                        Calendar.getInstance().timeInMillis,
+                        user ="user",
+                        message = messageText.text.toString(),
+                        time = Calendar.getInstance().timeInMillis,
                         sent = true
                 )
+                val messageText = messageText.text.toString()
                 onMessageSend(message)
                 resetInput()
+                elizaReply(messageText)
             }
         }
     }
-
+ /**
     private fun updateUI(){
         adapter = MessageAdapter()
         chatRecyclerView.adapter = adapter
     }
+**/
 
+    private fun updateUI(messageList: List<Message>){
+     adapter = MessageAdapter()
+     adapter!!.setMessageList(messageList)
+     chatRecyclerView.adapter = adapter
+ }
     companion object {
         @JvmStatic
         fun newInstance() = ElizaFragment()
     }
 
-    fun onMessageSend(message: Message){
-       chatViewModel.addMessage(message)
+    private fun onMessageSend(message: Message){
+        chatViewModel.saveMessage(message)
         chatRecyclerView.smoothScrollToPosition(chatViewModel.getItemCount());
+    }
+
+    private fun elizaReply(string: String){
+        val elizaMessages = chatViewModel.elizaGenerateReply(string)
+        for (elizaMessage in elizaMessages) {
+            onMessageSend(elizaMessage)
+        }
+
     }
 
 
     private val messageObserver = Observer<List<Message>> { newMessageList ->
-        adapter?.setMessageList(newMessageList as MutableList<Message>)
+        updateUI(newMessageList)
     }
 
 
-    private fun resetInput(){
+    private fun resetInput(){21
        // val inputManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         messageText.text.clear()
         //inputManager.hideSoftInputFromWindow(currentFocus!!.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
     }
-
-
 }

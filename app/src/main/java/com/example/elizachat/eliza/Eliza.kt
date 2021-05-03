@@ -1,9 +1,9 @@
-package com.zypus.eliza
+package com.example.elizachat.eliza
 
-import com.zypus.eliza.dsl.Goto
-import com.zypus.eliza.dsl.Key
-import com.zypus.eliza.dsl.Reassembly
-import com.zypus.eliza.dsl.Script
+//import com.zypus.eliza.dsl.Goto
+//import com.zypus.eliza.dsl.Key
+//import com.zypus.eliza.dsl.Reassembly
+//import com.zypus.eliza.dsl.Script
 
 /**
  * The main engine of ELIZA.

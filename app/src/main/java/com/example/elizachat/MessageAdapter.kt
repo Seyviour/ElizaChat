@@ -17,7 +17,7 @@ class MessageAdapter(): RecyclerView.Adapter<MessageViewHolder>(){
 
     private var messages: List<Message>? = null
 
-    fun setMessageList(messageList: MutableList<Message>){
+    fun setMessageList(messageList: List<Message>){
         messages = messageList
         notifyDataSetChanged()
     }
@@ -67,12 +67,10 @@ class MessageAdapter(): RecyclerView.Adapter<MessageViewHolder>(){
     }
 
     override fun onBindViewHolder(holder: MessageViewHolder, position: Int){
-        val item = holder.itemView
         messages.let{
             val message = it!![position]
             holder?.bind(message)
         }
-
     }
 
 

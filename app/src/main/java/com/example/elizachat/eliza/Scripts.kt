@@ -1,7 +1,7 @@
-package com.zypus.eliza
+package com.example.elizachat.eliza
 
 
-import com.zypus.eliza.dsl.script
+
 
 /**
  * Object holding all predefined scripts.
