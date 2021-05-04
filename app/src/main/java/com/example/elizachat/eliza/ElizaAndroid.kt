@@ -5,13 +5,6 @@ package com.example.elizachat.eliza
 //import com.zypus.eliza.dsl.Reassembly
 //import com.zypus.eliza.dsl.Script
 
-/**
- * The main engine of ELIZA.
- *
- * @author Zypus
- *
- * @created 10.10.17
- */
 
 
 

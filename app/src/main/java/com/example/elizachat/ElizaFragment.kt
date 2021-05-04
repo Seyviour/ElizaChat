@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.get
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -12,6 +13,7 @@ import kotlinx.android.synthetic.main.fragment_eliza.*
 import java.util.*
 import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
+import kotlinx.android.synthetic.main.card_message.view.*
 
 private const val TAG = "ElizaFragment"
 
@@ -41,13 +43,19 @@ class ElizaFragment : Fragment() {
         chatRecyclerView.layoutManager = LinearLayoutManager(context).apply {
             stackFromEnd = true
         }
+        chatRecyclerView.adapter = adapter
+
         return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+       // var scond: Boolean = false
+        //val cond = chatViewModel.messagesLiveData.value?.size
         chatViewModel.messagesLiveData.observe(viewLifecycleOwner, messageObserver)
-        if (chatViewModel.elizaHasMemory()){
+        /**
+        if (chatViewModel.elizaHasMemory() and !scond){
             val elizaPrompt = Message(
                     user="Eliza",
                     message ="What's on your mind",
@@ -55,7 +63,8 @@ class ElizaFragment : Fragment() {
                     time=Calendar.getInstance().timeInMillis
             )
             onMessageSend(elizaPrompt)
-        }
+         }
+**/
 
     }
 
@@ -69,8 +78,13 @@ class ElizaFragment : Fragment() {
 
 
             if (messageText.text.isNotEmpty()){
+
+                messageText.hint = "Enter Message"
                 val message = Message(
                         user ="user",
+
+
+
                         message = messageText.text.toString(),
                         time = Calendar.getInstance().timeInMillis,
                         sent = true
@@ -90,10 +104,10 @@ class ElizaFragment : Fragment() {
 **/
 
     private fun updateUI(messageList: List<Message>){
-     adapter = MessageAdapter()
      adapter!!.setMessageList(messageList)
-     chatRecyclerView.adapter = adapter
- }
+     chatRecyclerView.layoutManager = LinearLayoutManager(context).apply { stackFromEnd = true }
+     }
+
     companion object {
         @JvmStatic
         fun newInstance() = ElizaFragment()
@@ -101,7 +115,7 @@ class ElizaFragment : Fragment() {
 
     private fun onMessageSend(message: Message){
         chatViewModel.saveMessage(message)
-        chatRecyclerView.smoothScrollToPosition(chatViewModel.getItemCount());
+        chatRecyclerView.smoothScrollToPosition(chatViewModel.messagesLiveData.value!!.size);
     }
 
     private fun elizaReply(string: String){
@@ -118,7 +132,7 @@ class ElizaFragment : Fragment() {
     }
 
 
-    private fun resetInput(){21
+    private fun resetInput(){
        // val inputManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         messageText.text.clear()
         //inputManager.hideSoftInputFromWindow(currentFocus!!.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
